@@ -1,52 +1,75 @@
-# 优途加速器——轻松连接全世界
-<div><b>永久保存优途联系方式（收藏当前网址可以永久打开，再也不担心找不到优途官网）</b></div>
-<br>
-<div>1、电脑浏览器：找到浏览器的“<b>☆</b>”号，点击即可收藏，以后打开浏览器即可在顶部或者收藏夹里面找到优途加速器。</div>
-<div>2、手机浏览器（Uc为例）：打开设置，找到“<b>添加标签（添加收藏）</b>”按钮，点击一下即可”，以后只要打开Uc浏览器，找到设置——收藏/历史，即可找到优途加速器。</div>
-<div>3、微信网页：打开当前网页，右上角“<b>···</b>”添加收藏，然后在右下角“我——收藏”即可找到并且联系上优途加速器。</div>
+#!/bin/bash
 
-<div>各平台安装包下载（请在浏览器中打开)</div>
-<br>
-<div><a href="https://ytxz.runjiawang.cn/android/20230706/yuutto_v1.2.88_youtujsq.apk" target="_blank">Android安卓客户端下载</a></div>
-<div><a href="https://ytxz.runjiawang.cn/android/20230706/yuutto_v1.2.88_youtujsq.apk" target="_blank">鸿蒙系统手机下载</a></div>
-<div><a href="https://ytxz.runjiawang.cn/pc/20230508/Yuutto_23.05.08.01_youtujsq.zip" target="_blank">Windows绿色版</a></div>
-<div><a href="http://www.youtujsq.com/courseDetailAppleStoreIdModifiction.html" target="_blank">Iphone & Ipad 商城版下载</a></div>
-<div><a href="http://www.youtujsq.com/courseDetailAppleStoreMac.html" target="_blank">Mac商城版下载</a></div>
-<div><a href="http://youtujsq.com" target="_blank"> 官方网站：www.youtujsq.com 、 www.youtuvpn.com  、 youtujsq1.net </a> </div>
-<br>
-<div>——————————————分割线——————————————</div>
-<br>
+# ==========================
+# WireGuard VPN 安装脚本
+# 适用于 Ubuntu 20.04+/Debian
+# ==========================
 
-<div><a href="https://xiabeizi.zheyishitaimanchang.xyz/chatlink.html" target="_blank">联系真人在线客服（点我）</a></div>
-<div><a href="https://t.me/youtujiasuqi" target="_blank">加入telegram群组（需要翻墙才可以打开该链接），将有机会获得3天免费时长</a></div>
-<div>需商务合作请联系 邮箱 ：yuuttojsqjsq@gmail.com</a></div>
-<br>
+set -e
 
+# 设置服务端信息
+SERVER_PORT=51820
+SERVER_IP=$(curl -s ifconfig.me)  # 或手动指定IP
+WG_INTERFACE=wg0
+WG_CONF="/etc/wireguard/${WG_INTERFACE}.conf"
 
+# 生成密钥对
+mkdir -p /etc/wireguard/keys
+cd /etc/wireguard/keys
 
+umask 077
+wg genkey | tee server_private.key | wg pubkey > server_public.key
+wg genkey | tee client_private.key | wg pubkey > client_public.key
 
+SERVER_PRIV_KEY=$(<server_private.key)
+SERVER_PUB_KEY=$(<server_public.key)
+CLIENT_PRIV_KEY=$(<client_private.key)
+CLIENT_PUB_KEY=$(<client_public.key)
 
-English
-# Youtu Accelerator - easily connect the world
-<div><b>Permanently save the best way contact information (collection of the current website can be permanently opened, no longer worry about finding the best way official website)</b></div>
-<br>
-<div>1. Computer browser: Find the "<b>☆</b>" number of the browser, click it to collect, and then open the browser to find the accelerator at the top or inside the favorites.</div>
-<div>2, mobile browser (Uc for example) : open the Settings, find the "<b> Add label (add favorites) </b>" button, click it ", after the Uc browser, find Settings - favorites/history, you can find the best way accelerator.</div>
-<div>3, wechat page: Open the current page, the upper right corner "<b>···</b>" to add favorites, and then in the lower right corner "I -- favorites" can find and contact the accelerator.</div>
+# 安装 WireGuard
+apt update
+apt install -y wireguard iproute2 resolvconf
 
-<div>Download each platform installation package (please open in your browser)</div>
-<br>
-<div><a href="https://ytxz.runjiawang.cn/android/20230706/yuutto_v1.2.88_youtujsq.apk" target="_blank">Android download</a></div>
-<div><a href="https://ytxz.runjiawang.cn/android/20230706/yuutto_v1.2.88_youtujsq.apk" target="_blank">HongMeng download</a></div>
-<div><a href="https://ytxz.runjiawang.cn/pc/20230508/Yuutto_23.05.08.01_youtujsq.zip" target="_blank">Windows Green board download</a></div>
-<div><a href="http://www.youtujsq.com/courseDetailAppleStoreIdModifiction.html" target="_blank">Iphone & Ipad APPStore  download</a></div>
-<div><a href="http://www.youtujsq.com/courseDetailAppleStoreMac.html" target="_blank">Mac APPstore download</a></div>
-<div><a href="http://youtujsq.com" target="_blank">Official website：www.youtujsq.com 、 www.youtuvpn.com  、 youtujsq1.net </a> </div>
-<br>
-<div>——————————————分割线——————————————</div>
-<br>
+# 启用 IP 转发
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+echo "net.ipv6.conf.all.forwarding = 1" >> /etc/sysctl.conf
+sysctl -p
 
-<div><a href="https://xiabeizi.zheyishitaimanchang.xyz/chatlink.html" target="_blank">Contact real person online customer service (click me)</a></div>
-<div><a href="https://t.me/youtujiasuqi" target="_blank">Join a telegram group (you need to climb over the wall to open the link) and get a chance to get 3 days of free time</a></div>
-<div>For business cooperation, please contact email：yuuttojsqjsq@gmail.com</a></div>
-<br>
+# 创建 WireGuard 配置
+cat > $WG_CONF <<EOF
+[Interface]
+PrivateKey = $SERVER_PRIV_KEY
+Address = 10.0.0.1/24
+ListenPort = $SERVER_PORT
+SaveConfig = true
+
+PostUp = ufw route allow in on $WG_INTERFACE out on eth0; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = ufw route delete allow in on $WG_INTERFACE out on eth0; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+[Peer]
+PublicKey = $CLIENT_PUB_KEY
+AllowedIPs = 10.0.0.2/32
+EOF
+
+chmod 600 $WG_CONF
+
+# 启动服务
+systemctl enable wg-quick@$WG_INTERFACE
+systemctl start wg-quick@$WG_INTERFACE
+
+# 输出客户端配置
+cat > ~/client.conf <<EOF
+[Interface]
+PrivateKey = $CLIENT_PRIV_KEY
+Address = 10.0.0.2/24
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = $SERVER_PUB_KEY
+Endpoint = $SERVER_IP:$SERVER_PORT
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25
+EOF
+
+echo -e "\n✅ WireGuard VPN 安装完成"
+echo "📁 客户端配置文件位于: ~/client.conf"
